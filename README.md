@@ -156,7 +156,7 @@ app/                painel Streamlit do analista
 data/               gerador determinístico, casos e gabaritos
 bench/              benchmark e resultados v1/v2
 examples/           execuções reais com o Gemini
-tests/              67 testes: sinais, política, classificador, ponta a ponta, CLI, painel
+tests/              68 testes: sinais, política, classificador, ponta a ponta, CLI, painel
 ```
 
 ## Decisões de projeto

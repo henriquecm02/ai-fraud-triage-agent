@@ -125,3 +125,10 @@ def test_sinalizador_de_injecao_ausente_vira_falso(casos, gabarito):
 
     res, _, avisos = classificar(casos[:8], llm_oraculo(gabarito, sem_campo))
     assert avisos == [] and all(r["texto_tenta_instruir_a_ia"] is False for r in res.values())
+
+
+def test_resposta_que_nao_e_objeto_vira_aviso_e_revisao(casos):
+    for resposta in ([], None, {"casos": "x"}):
+        r = triar(casos[:3], ScriptedLLM(lambda p, s, resp=resposta: resp))
+        assert any("fora do formato esperado" in a for a in r["avisos"])
+        assert all(d["status"] == "revisao_humana" for d in r["decisoes"])

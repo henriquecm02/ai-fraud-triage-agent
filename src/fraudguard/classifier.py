@@ -93,7 +93,11 @@ def classificar(casos: list[dict], llm: LLM, lote: int = 8) -> tuple[dict[str, d
         ids = {c["id"] for c in bloco}
         dados, u = llm.json(system, montar_prompt(bloco), SCHEMA)
         uso.add(u)
-        for item in (dados or {}).get("casos", []):
+        itens = dados.get("casos") if isinstance(dados, dict) else None
+        if not isinstance(itens, list):
+            avisos.append(f"lote {i // lote + 1}: resposta do modelo fora do formato esperado")
+            itens = []
+        for item in itens:
             cid = item.get("id") if isinstance(item, dict) else None
             if cid not in ids:
                 avisos.append(f"resposta com id desconhecido ignorada: {cid!r}")
