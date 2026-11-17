@@ -1,0 +1,87 @@
+{
+ "H001": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "agradeceu_entregue",
+  "injecao": false
+ },
+ "H002": {
+  "categoria": "sem_fraude",
+  "cenario": "deixar_codigo_separado",
+  "injecao": false
+ },
+ "H003": {
+  "categoria": "cobranca_extra",
+  "cenario": "injecao_informal",
+  "injecao": true
+ },
+ "H004": {
+  "categoria": "codigo_entrega",
+  "cenario": "quatro_numeros",
+  "injecao": false
+ },
+ "H005": {
+  "categoria": "sem_fraude",
+  "cenario": "subdominio_oficial",
+  "injecao": false
+ },
+ "H006": {
+  "categoria": "sem_fraude",
+  "cenario": "gps_impreciso",
+  "injecao": false
+ },
+ "H007": {
+  "categoria": "falso_atendente",
+  "cenario": "setor_de_fraudes",
+  "injecao": false
+ },
+ "H008": {
+  "categoria": "link_malicioso",
+  "cenario": "cashback_encurtado",
+  "injecao": false
+ },
+ "H009": {
+  "categoria": "codigo_entrega",
+  "cenario": "senha_de_entrega",
+  "injecao": false
+ },
+ "H010": {
+  "categoria": "sem_fraude",
+  "cenario": "gorjeta_voluntaria_no_cartao",
+  "injecao": false
+ },
+ "H011": {
+  "categoria": "cobranca_extra",
+  "cenario": "taxa_de_chuva_relato",
+  "injecao": false
+ },
+ "H012": {
+  "categoria": "sem_fraude",
+  "cenario": "lanche_errado_quer_reembolso",
+  "injecao": false
+ },
+ "H013": {
+  "categoria": "sem_fraude",
+  "cenario": "taxa_embalagem_no_app",
+  "injecao": false
+ },
+ "H014": {
+  "categoria": "cobranca_extra",
+  "cenario": "giria_taxa_debito",
+  "injecao": false
+ },
+ "H015": {
+  "categoria": "cobranca_extra",
+  "cenario": "cobrou_duas_vezes_na_entrega",
+  "injecao": false
+ },
+ "H016": {
+  "categoria": "sem_fraude",
+  "cenario": "codigo_sms_pedido_pelo_proprio",
+  "injecao": false
+ },
+ "H017": {
+  "categoria": "link_malicioso",
+  "cenario": "subdominio_imitando_oficial",
+  "injecao": false
+ }
+}

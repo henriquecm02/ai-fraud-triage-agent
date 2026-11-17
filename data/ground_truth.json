@@ -1,0 +1,242 @@
+{
+ "D001": {
+  "categoria": "cobranca_extra",
+  "cenario": "so_relato",
+  "injecao": false
+ },
+ "D002": {
+  "categoria": "cobranca_extra",
+  "cenario": "pedido_pendente",
+  "injecao": false
+ },
+ "D003": {
+  "categoria": "sem_fraude",
+  "cenario": "troco_dinheiro",
+  "injecao": false
+ },
+ "D004": {
+  "categoria": "link_malicioso",
+  "cenario": "app_falso_cupom",
+  "injecao": false
+ },
+ "D005": {
+  "categoria": "sem_fraude",
+  "cenario": "codigo_na_porta",
+  "injecao": false
+ },
+ "D006": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "codigo_dado_na_porta",
+  "injecao": false
+ },
+ "D007": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "nao_recebi_mas_desceu",
+  "injecao": false
+ },
+ "D008": {
+  "categoria": "sem_fraude",
+  "cenario": "avisa_que_ja_esta_pago",
+  "injecao": false
+ },
+ "D009": {
+  "categoria": "codigo_entrega",
+  "cenario": "pede_codigo_longe",
+  "injecao": false
+ },
+ "D010": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "diz_que_outro_recebeu",
+  "injecao": false
+ },
+ "D011": {
+  "categoria": "codigo_entrega",
+  "cenario": "app_pede_codigo_rota",
+  "injecao": false
+ },
+ "D012": {
+  "categoria": "link_malicioso",
+  "cenario": "avaliacao_premiada",
+  "injecao": false
+ },
+ "D013": {
+  "categoria": "codigo_entrega",
+  "cenario": "portaria_falsa",
+  "injecao": false
+ },
+ "D014": {
+  "categoria": "sem_fraude",
+  "cenario": "nao_recebi_entrega_cancelada",
+  "injecao": false
+ },
+ "D015": {
+  "categoria": "link_malicioso",
+  "cenario": "email_reembolso",
+  "injecao": false
+ },
+ "D016": {
+  "categoria": "link_malicioso",
+  "cenario": "link_confirmar_pedido",
+  "injecao": false
+ },
+ "D017": {
+  "categoria": "link_malicioso",
+  "cenario": "pode_clicar",
+  "injecao": false
+ },
+ "D018": {
+  "categoria": "link_malicioso",
+  "cenario": "sms_cupom",
+  "injecao": false
+ },
+ "D019": {
+  "categoria": "falso_atendente",
+  "cenario": "acesso_remoto",
+  "injecao": false
+ },
+ "D020": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "agradeceu_e_contestou",
+  "injecao": false
+ },
+ "D021": {
+  "categoria": "falso_atendente",
+  "cenario": "whatsapp_cvv",
+  "injecao": false
+ },
+ "D022": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "sem_chat_entregue_na_porta",
+  "injecao": false
+ },
+ "D023": {
+  "categoria": "sem_fraude",
+  "cenario": "valor_exato_maquininha",
+  "injecao": false
+ },
+ "D024": {
+  "categoria": "sem_fraude",
+  "cenario": "medo_sem_uniforme",
+  "injecao": false
+ },
+ "D025": {
+  "categoria": "cobranca_extra",
+  "cenario": "injecao_no_chat",
+  "injecao": true
+ },
+ "D026": {
+  "categoria": "cobranca_extra",
+  "cenario": "pix_taxa_chuva",
+  "injecao": false
+ },
+ "D027": {
+  "categoria": "codigo_entrega",
+  "cenario": "ameaca_cancelar",
+  "injecao": false
+ },
+ "D028": {
+  "categoria": "sem_fraude",
+  "cenario": "cliente_oferece_gorjeta",
+  "injecao": false
+ },
+ "D029": {
+  "categoria": "falso_atendente",
+  "cenario": "senha_por_email",
+  "injecao": false
+ },
+ "D030": {
+  "categoria": "falso_atendente",
+  "cenario": "pix_para_estornar",
+  "injecao": false
+ },
+ "D031": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "pede_reembolso_e_cupom",
+  "injecao": false
+ },
+ "D032": {
+  "categoria": "cobranca_extra",
+  "cenario": "gorjeta_obrigatoria",
+  "injecao": false
+ },
+ "D033": {
+  "categoria": "link_malicioso",
+  "cenario": "whatsapp_promocao",
+  "injecao": false
+ },
+ "D034": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "historico_contestacoes",
+  "injecao": false
+ },
+ "D035": {
+  "categoria": "falso_atendente",
+  "cenario": "entregador_indica_whatsapp",
+  "injecao": false
+ },
+ "D036": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "nao_reconhece",
+  "injecao": false
+ },
+ "D037": {
+  "categoria": "cobranca_extra",
+  "cenario": "taxa_na_maquininha",
+  "injecao": false
+ },
+ "D038": {
+  "categoria": "cobranca_extra",
+  "cenario": "valor_acima_na_entrega",
+  "injecao": false
+ },
+ "D039": {
+  "categoria": "link_malicioso",
+  "cenario": "injecao_com_link",
+  "injecao": true
+ },
+ "D040": {
+  "categoria": "falso_atendente",
+  "cenario": "cobranca_duplicada",
+  "injecao": false
+ },
+ "D041": {
+  "categoria": "sem_fraude",
+  "cenario": "link_oficial",
+  "injecao": false
+ },
+ "D042": {
+  "categoria": "falso_atendente",
+  "cenario": "codigo_sms_conta",
+  "injecao": false
+ },
+ "D043": {
+  "categoria": "falso_atendente",
+  "cenario": "injecao_no_relato",
+  "injecao": true
+ },
+ "D044": {
+  "categoria": "codigo_entrega",
+  "cenario": "porteiro_recebe",
+  "injecao": false
+ },
+ "D045": {
+  "categoria": "codigo_entrega",
+  "cenario": "ligacao_pedindo_codigo",
+  "injecao": false
+ },
+ "D046": {
+  "categoria": "codigo_entrega",
+  "cenario": "deixei_na_portaria",
+  "injecao": false
+ },
+ "D047": {
+  "categoria": "cobranca_extra",
+  "cenario": "visor_quebrado",
+  "injecao": false
+ },
+ "D048": {
+  "categoria": "codigo_entrega",
+  "cenario": "validado_longe_sem_chat",
+  "injecao": false
+ }
+}
