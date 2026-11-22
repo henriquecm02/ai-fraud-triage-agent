@@ -1,0 +1,118 @@
+{
+ "data": "2026-11-22 23:41",
+ "casos": 16,
+ "conjunto": "data/cases_ruidosos.jsonl",
+ "gabarito": "data/ground_truth_ruidosos.json",
+ "baseline": {
+  "casos": 16,
+  "acuracia": 0.75,
+  "acertos": 12,
+  "f1_macro": 0.665,
+  "por_categoria": {
+   "cobranca_extra": {
+    "precisao": 1.0,
+    "recall": 0.75,
+    "f1": 0.857,
+    "suporte": 4
+   },
+   "codigo_entrega": {
+    "precisao": 1.0,
+    "recall": 0.667,
+    "f1": 0.8,
+    "suporte": 3
+   },
+   "falso_atendente": {
+    "precisao": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "suporte": 2
+   },
+   "link_malicioso": {
+    "precisao": 0.333,
+    "recall": 1.0,
+    "f1": 0.5,
+    "suporte": 1
+   },
+   "contestacao_suspeita": {
+    "precisao": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "suporte": 1
+   },
+   "sem_fraude": {
+    "precisao": 0.714,
+    "recall": 1.0,
+    "f1": 0.833,
+    "suporte": 5
+   }
+  },
+  "falso_alarme_em_legitimos": "0/5",
+  "golpes_classificados_como_sem_fraude": "2/11",
+  "clientes_acusados_indevidamente": 0,
+  "erros": [
+   {
+    "id": "R004",
+    "esperado": "codigo_entrega",
+    "previsto": "sem_fraude",
+    "cenario": "codigo_sem_telemetria"
+   },
+   {
+    "id": "R007",
+    "esperado": "falso_atendente",
+    "previsto": "link_malicioso",
+    "cenario": "suporte_whatsapp_com_link"
+   },
+   {
+    "id": "R010",
+    "esperado": "cobranca_extra",
+    "previsto": "link_malicioso",
+    "cenario": "taxa_e_link_de_estorno"
+   },
+   {
+    "id": "R014",
+    "esperado": "falso_atendente",
+    "previsto": "sem_fraude",
+    "cenario": "central_por_telefone_digitado"
+   }
+  ]
+ },
+ "rodadas": [],
+ "multirrotulo_baseline": {
+  "casos_com_varios_golpes": 3,
+  "golpes_encontrados": "4/6",
+  "casos_com_todos_os_golpes": "1/3",
+  "detalhes": [
+   {
+    "id": "R001",
+    "esperado": [
+     "codigo_entrega",
+     "falso_atendente"
+    ],
+    "previsto": [
+     "codigo_entrega"
+    ]
+   },
+   {
+    "id": "R007",
+    "esperado": [
+     "falso_atendente",
+     "link_malicioso"
+    ],
+    "previsto": [
+     "link_malicioso"
+    ]
+   },
+   {
+    "id": "R010",
+    "esperado": [
+     "cobranca_extra",
+     "link_malicioso"
+    ],
+    "previsto": [
+     "cobranca_extra",
+     "link_malicioso"
+    ]
+   }
+  ]
+ }
+}

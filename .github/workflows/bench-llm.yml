@@ -1,0 +1,32 @@
+name: bench-llm
+# Benchmark com o Gemini real nos três conjuntos. Manual, porque consome cota e precisa do secret GEMINI_API_KEY.
+on:
+  workflow_dispatch:
+    inputs:
+      modelo:
+        description: "Modelo do Gemini"
+        default: "gemini-3.1-flash-lite"
+      rodadas:
+        description: "Rodadas por conjunto (mede a variação do modelo)"
+        default: "3"
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Benchmark
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          for conjunto in "" _dificeis _ruidosos; do
+            python bench/run_benchmark.py --modelo "${{ inputs.modelo }}" --rodadas "${{ inputs.rodadas }}" \
+              --casos "data/cases${conjunto}.jsonl" --gabarito "data/ground_truth${conjunto}.json" --saida bench/results/ci
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-llm
+          path: bench/results/ci

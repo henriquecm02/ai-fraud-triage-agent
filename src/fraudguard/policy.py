@@ -156,11 +156,30 @@ def decidir(caso: dict, sinais: list[Sinal], clf: dict | None) -> dict:
         acoes = [{"acao": a, "automatica": auto} for a, auto in ACOES[categoria]]
         prioridade = {"encerrado": "baixa"}.get(status, "media" if categoria == "contestacao_suspeita" else "alta")
 
+    # Golpes secundários: só de terceiros (o cliente nunca é acusado como "golpe adicional").
+    # Ficam se o modelo apontou ou se um sinal forte das regras apoia a categoria.
+    outras = []
+    candidatas = list((clf or {}).get("outras_categorias", [])) + [
+        c for c in GOLPE_DE_TERCEIRO if any(s.forca == FORTE and s.id in SUPORTE[c] for s in sinais)]
+    for c in dict.fromkeys(candidatas):
+        if c in GOLPE_DE_TERCEIRO and c != categoria and categoria not in ("indefinida",):
+            origem = "modelo" if c in (clf or {}).get("outras_categorias", []) else "regras"
+            outras.append({"categoria": c, "origem": origem})
+    if categoria == "sem_fraude":
+        outras = []  # conflito já vai para revisão pelos motivos acima
+    vistas = {a["acao"] for a in acoes}
+    for o in outras:
+        for a, auto in ACOES[o["categoria"]]:
+            if a not in vistas:
+                acoes.append({"acao": a, "automatica": auto and status != "revisao_humana"})
+                vistas.add(a)
+
     mensagem, do_modelo = mensagem_segura(categoria, status, sugerida)
     apoio = [s.id for s in sinais if s.id in SUPORTE.get(categoria, ())]
     return {
         "id": caso["id"],
         "categoria": categoria,
+        "outras_categorias": outras,
         "confianca_modelo": confianca,
         "status": status,
         "prioridade": prioridade,

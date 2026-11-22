@@ -1,0 +1,133 @@
+{
+ "R001": {
+  "categoria": "codigo_entrega",
+  "cenario": "codigo_e_falso_suporte",
+  "injecao": false,
+  "categorias": [
+   "codigo_entrega",
+   "falso_atendente"
+  ]
+ },
+ "R002": {
+  "categoria": "contestacao_suspeita",
+  "cenario": "contestacao_com_historico_e_erros",
+  "injecao": false,
+  "categorias": [
+   "contestacao_suspeita"
+  ]
+ },
+ "R003": {
+  "categoria": "sem_fraude",
+  "cenario": "troco_com_erro",
+  "injecao": false,
+  "categorias": [
+   "sem_fraude"
+  ]
+ },
+ "R004": {
+  "categoria": "codigo_entrega",
+  "cenario": "codigo_sem_telemetria",
+  "injecao": false,
+  "categorias": [
+   "codigo_entrega"
+  ]
+ },
+ "R005": {
+  "categoria": "codigo_entrega",
+  "cenario": "relato_curto",
+  "injecao": false,
+  "categorias": [
+   "codigo_entrega"
+  ]
+ },
+ "R006": {
+  "categoria": "sem_fraude",
+  "cenario": "atraso_com_erros",
+  "injecao": false,
+  "categorias": [
+   "sem_fraude"
+  ]
+ },
+ "R007": {
+  "categoria": "falso_atendente",
+  "cenario": "suporte_whatsapp_com_link",
+  "injecao": false,
+  "categorias": [
+   "falso_atendente",
+   "link_malicioso"
+  ]
+ },
+ "R008": {
+  "categoria": "link_malicioso",
+  "cenario": "link_sem_protocolo_maiusculas",
+  "injecao": false,
+  "categorias": [
+   "link_malicioso"
+  ]
+ },
+ "R009": {
+  "categoria": "cobranca_extra",
+  "cenario": "pix_sem_telemetria",
+  "injecao": false,
+  "categorias": [
+   "cobranca_extra"
+  ]
+ },
+ "R010": {
+  "categoria": "cobranca_extra",
+  "cenario": "taxa_e_link_de_estorno",
+  "injecao": false,
+  "categorias": [
+   "cobranca_extra",
+   "link_malicioso"
+  ]
+ },
+ "R011": {
+  "categoria": "cobranca_extra",
+  "cenario": "digitacao_maquininha",
+  "injecao": false,
+  "categorias": [
+   "cobranca_extra"
+  ]
+ },
+ "R012": {
+  "categoria": "cobranca_extra",
+  "cenario": "injecao_com_erro_de_digitacao",
+  "injecao": true,
+  "categorias": [
+   "cobranca_extra"
+  ]
+ },
+ "R013": {
+  "categoria": "sem_fraude",
+  "cenario": "link_oficial_em_maiusculas",
+  "injecao": false,
+  "categorias": [
+   "sem_fraude"
+  ]
+ },
+ "R014": {
+  "categoria": "falso_atendente",
+  "cenario": "central_por_telefone_digitado",
+  "injecao": false,
+  "categorias": [
+   "falso_atendente"
+  ]
+ },
+ "R015": {
+  "categoria": "sem_fraude",
+  "cenario": "contestacao_sem_telemetria",
+  "injecao": false,
+  "categorias": [
+   "sem_fraude"
+  ]
+ },
+ "R016": {
+  "categoria": "sem_fraude",
+  "cenario": "codigo_na_porta_digitado",
+  "injecao": false,
+  "categorias": [
+   "sem_fraude"
+  ]
+ }
+}

@@ -12,6 +12,8 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import asdict, dataclass
+from difflib import get_close_matches
+from functools import lru_cache
 from urllib.parse import urlparse
 
 # Domínios oficiais da plataforma fictícia. Em produção viria de configuração.
@@ -42,6 +44,37 @@ def normalizar(texto: str) -> str:
     t = "".join(ch for ch in t if not unicodedata.combining(ch))
     t = t.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
     return re.sub(r"\s+", " ", t).strip().lower()
+
+
+# Palavras-chave das regras. Erros de digitação comuns ("cogido", "makininha", "atendimeto") são
+# corrigidos para a palavra mais parecida desta lista antes das regex. A correção é genérica
+# (similaridade de caracteres), não uma lista de erros conhecidos.
+VOCABULARIO = (
+    "codigo", "maquininha", "maquina", "cartao", "cobrar", "cobrei", "cobrou", "cobranca", "pagamento",
+    "suporte", "atendimento", "atendente", "central", "whatsapp", "ligacao", "telefone", "contato",
+    "instrucoes", "ignore", "classifique", "sistema", "assistente", "gorjeta", "obrigatoria", "senha",
+)
+_RE_PALAVRA = re.compile(r"[a-z]{5,}")
+
+
+@lru_cache(maxsize=4096)
+def _corrigir_palavra(palavra: str) -> str:
+    if palavra in VOCABULARIO:
+        return palavra
+    perto = get_close_matches(palavra, VOCABULARIO, n=1, cutoff=0.8)
+    if perto:
+        return perto[0]
+    # letras trocadas de lugar ("cogido"): mesmas letras, mesma inicial, 6+ caracteres
+    if len(palavra) >= 6:
+        for v in VOCABULARIO:
+            if len(v) == len(palavra) and v[0] == palavra[0] and sorted(v) == sorted(palavra):
+                return v
+    return palavra
+
+
+def corrigir_digitacao(texto_normalizado: str) -> str:
+    """Troca palavras com erro de digitação pela palavra-chave mais parecida (similaridade >= 0,8)."""
+    return _RE_PALAVRA.sub(lambda m: _corrigir_palavra(m.group(0)), texto_normalizado)
 
 
 _RE_DINHEIRO = re.compile(r"\b(taxa|maquin\w*|cobr\w*|pag(ar|amento|ue|a)\b|pix|cartao|gorjeta obrigat\w*)")
@@ -102,7 +135,7 @@ def calcular_sinais(caso: dict) -> list[Sinal]:
     for msg in caso.get("chat", []):
         autor = msg.get("autor")
         texto = msg.get("texto", "")
-        t = normalizar(texto)
+        t = corrigir_digitacao(normalizar(texto))
         dist = msg.get("distancia_entregador_m")
         de_terceiro = autor != "cliente"
 
@@ -146,10 +179,16 @@ def calcular_sinais(caso: dict) -> list[Sinal]:
 
     # Tentativa de injeção de prompt em qualquer texto controlado por terceiros
     for texto in textos:
-        if _RE_INJECAO.search(normalizar(texto)):
+        if _RE_INJECAO.search(corrigir_digitacao(normalizar(texto))):
             sinais.append(Sinal("tentativa_de_injecao", FORTE,
                                 "Texto tenta dar ordens ao sistema de IA", texto[:160]))
             break
+
+    tipos = {ev.get("tipo") for ev in caso.get("eventos", [])}
+    if "codigo_validado" not in tipos and "entrega_cancelada" not in tipos:
+        sinais.append(Sinal("telemetria_ausente", MODERADO,
+                            "Sem registro de chegada nem de validação do código",
+                            "eventos: " + (", ".join(sorted(t for t in tipos if t)) or "nenhum")))
 
     if int(pedido.get("contestacoes_90d", 0)) >= 3:
         sinais.append(Sinal("historico_de_contestacoes", MODERADO,

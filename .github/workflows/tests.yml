@@ -12,3 +12,5 @@ jobs:
       - run: ruff check .
       - run: pytest -q
       - run: python bench/run_benchmark.py --so-baseline --saida /tmp/bench
+      - run: python bench/run_benchmark.py --so-baseline --casos data/cases_ruidosos.jsonl --gabarito data/ground_truth_ruidosos.json --saida /tmp/bench
+      - run: python bench/run_benchmark.py --so-baseline --casos data/cases_ruidosos.jsonl --gabarito data/ground_truth_ruidosos.json --saida /tmp/bench

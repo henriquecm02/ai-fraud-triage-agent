@@ -30,6 +30,8 @@ SCHEMA = {
                 "properties": {
                     "id": {"type": "string"},
                     "categoria": {"type": "string", "enum": CATEGORIAS},
+                    # golpes adicionais no mesmo caso (opcional; a categoria principal fica em "categoria")
+                    "outras_categorias": {"type": "array", "items": {"type": "string", "enum": CATEGORIAS}},
                     "confianca": {"type": "string", "enum": CONFIANCAS},
                     "evidencias": {
                         "type": "array",
@@ -109,6 +111,9 @@ def classificar(casos: list[dict], llm: LLM, lote: int = 8) -> tuple[dict[str, d
                 avisos.append(f"{cid}: resposta fora do formato ignorada")
                 continue
             item["texto_tenta_instruir_a_ia"] = item.get("texto_tenta_instruir_a_ia") is True
+            outras = item.get("outras_categorias") if isinstance(item.get("outras_categorias"), list) else []
+            item["outras_categorias"] = [c for c in dict.fromkeys(outras)
+                                         if c in CATEGORIAS and c not in ("sem_fraude", item["categoria"])]
             item["evidencias"] = [e for e in item["evidencias"]
                                   if isinstance(e, dict) and isinstance(e.get("trecho"), str)]
             resultados[cid] = item

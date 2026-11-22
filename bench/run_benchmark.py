@@ -13,10 +13,11 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from statistics import mean, pstdev
 
-from fraudguard.baseline import classificar_por_regras
+from fraudguard.baseline import categorias_por_regras, classificar_por_regras
 from fraudguard.llm import QuotaExceeded
-from fraudguard.metrics import avaliar, avaliar_roteamento
+from fraudguard.metrics import avaliar, avaliar_multirrotulo, avaliar_roteamento
 from fraudguard.signals import calcular_sinais
 from fraudguard.triage import carregar_casos, triar
 
@@ -47,6 +48,20 @@ def resumo_md(res: dict) -> str:
            _linha("Só regras (baseline)", res["baseline"])]
     for i, r in enumerate(res["rodadas"], start=1):
         out.append(_linha(f"{r['modelo']} + política (rodada {i})", r["metricas"]))
+    if len(res["rodadas"]) > 1:
+        accs = [r["metricas"]["acuracia"] for r in res["rodadas"]]
+        out += ["", f"**Variação entre {len(accs)} rodadas:** acurácia média {mean(accs):.1%} "
+                f"(desvio {pstdev(accs):.1%}, mínimo {min(accs):.1%}, máximo {max(accs):.1%})."]
+    if res.get("multirrotulo_baseline"):
+        mb = res["multirrotulo_baseline"]
+        out += ["", "## Casos com mais de um golpe", "",
+                "| Abordagem | Golpes encontrados | Casos com todos os golpes |", "|---|---|---|",
+                f"| Só regras (baseline) | {mb['golpes_encontrados']} | {mb['casos_com_todos_os_golpes']} |"]
+        for i, r in enumerate(res["rodadas"], start=1):
+            mr = r.get("multirrotulo")
+            if mr:
+                out.append(f"| {r['modelo']} + política (rodada {i}) | {mr['golpes_encontrados']} | "
+                           f"{mr['casos_com_todos_os_golpes']} |")
     for i, r in enumerate(res["rodadas"], start=1):
         rot, m = r["roteamento"], r["metricas"]
         out += ["", f"## Rodada {i}: {r['modelo']}", "",
@@ -85,7 +100,9 @@ def main(argv=None) -> int:
     gabarito = json.loads(Path(a.gabarito).read_text(encoding="utf-8"))
     base = avaliar({c["id"]: classificar_por_regras(calcular_sinais(c)) for c in casos}, gabarito)
     res = {"data": datetime.now().strftime("%Y-%m-%d %H:%M"), "casos": len(casos),
-           "conjunto": _relativo(a.casos), "gabarito": _relativo(a.gabarito), "baseline": base, "rodadas": []}
+           "conjunto": _relativo(a.casos), "gabarito": _relativo(a.gabarito), "baseline": base, "rodadas": [],
+           "multirrotulo_baseline": avaliar_multirrotulo(
+               {c["id"]: categorias_por_regras(calcular_sinais(c)) for c in casos}, gabarito)}
 
     def registrar(r: dict) -> None:
         previstos = {d["id"]: d["categoria"] for d in r["decisoes"]}
@@ -93,6 +110,9 @@ def main(argv=None) -> int:
             "modelo": r["modelo"], "segundos": r["segundos"], "uso": r["uso"], "avisos": r["avisos"],
             "metricas": avaliar(previstos, gabarito),
             "roteamento": avaliar_roteamento(r["decisoes"], gabarito),
+            "multirrotulo": avaliar_multirrotulo(
+                {d["id"]: {d["categoria"], *(o["categoria"] for o in d.get("outras_categorias", []))}
+                 for d in r["decisoes"]}, gabarito),
             "decisoes": r["decisoes"],
         })
 

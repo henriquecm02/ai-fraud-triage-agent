@@ -67,3 +67,21 @@ def avaliar_roteamento(decisoes: list[dict], gabarito: dict[str, dict]) -> dict:
         "citacoes_literais": f"{ev_ok}/{total_ev}",
         "mensagens_do_modelo_usadas": sum(d["mensagem_do_modelo"] for d in decisoes),
     }
+
+
+def avaliar_multirrotulo(previstos: dict[str, set[str]], gabarito: dict[str, dict]) -> dict | None:
+    """Para casos com vários golpes (campo "categorias" no gabarito): quantos golpes foram encontrados."""
+    ids = sorted(i for i, g in gabarito.items() if len(g.get("categorias", [])) > 1)
+    if not ids:
+        return None
+    achados = total = completos = 0
+    detalhes = []
+    for i in ids:
+        verdade = set(gabarito[i]["categorias"])
+        prev = set(previstos.get(i, set()))
+        achados += len(verdade & prev)
+        total += len(verdade)
+        completos += verdade <= prev
+        detalhes.append({"id": i, "esperado": sorted(verdade), "previsto": sorted(prev)})
+    return {"casos_com_varios_golpes": len(ids), "golpes_encontrados": f"{achados}/{total}",
+            "casos_com_todos_os_golpes": f"{completos}/{len(ids)}", "detalhes": detalhes}

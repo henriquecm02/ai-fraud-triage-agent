@@ -54,10 +54,11 @@ flowchart LR
 
 ## Resultados
 
-Foram dois conjuntos sintéticos com gabarito separado, que o agente nunca vê:
+São três conjuntos sintéticos com gabarito separado, que o agente nunca vê:
 
 - **Principal** (`data/cases.jsonl`, 48 casos, 8 por categoria): cenários escritos a partir de golpes relatados publicamente, com casos legítimos parecidos com golpe e 3 injeções de prompt.
 - **Difícil** (`data/cases_dificeis.jsonl`, 17 casos): criado **depois** para tentar quebrar o sistema. Tem gíria, golpe sem a palavra "código", subdomínio imitando o oficial, injeção informal, GPS impreciso e gorjeta voluntária.
+- **Ruidoso** (`data/cases_ruidosos.jsonl`, 16 casos): criado para se parecer com denúncias reais. Tem erros de digitação ("cogido", "makininha", "igonre as instrucoes"), **3 casos com dois golpes ao mesmo tempo** (cobrança extra e link de "estorno", código e falso suporte, suporte no WhatsApp com link), telemetria ausente e relatos de duas palavras. O gabarito traz a categoria principal e a lista de todos os golpes.
 
 Versão final (`bench/results/v2_*`):
 
@@ -69,6 +70,7 @@ Versão final (`bench/results/v2_*`):
 | Difícil | `gemini-3.5-flash-lite` + política | **17/17** | 0/7 | 0/10 | 0 |
 | Difícil | `gemini-3.1-flash-lite` + política | **17/17** | 0/7 | 0/10 | 0 |
 
+- **No conjunto ruidoso**, as regras acertam 12 de 16 (75,0%) e encontram 4 dos 6 golpes nos casos com dois golpes, acertando todos os golpes em só 1 dos 3 casos (`bench/results/v3_ruidosos_baseline.md`). O agente com o Gemini ainda não foi medido nesse conjunto; ver *Ressalvas*.
 - **Onde o LLM agrega:** as regras não leem o relato do cliente. Por isso perdem golpes contados só ali, como o falso atendente por telefone (recall de 0,12) e a contestação sem histórico (0,38). No conjunto difícil, as regras ainda alarmam 2 casos legítimos: a gorjeta voluntária no cartão e o GPS impreciso.
 - **Custo:** 6 chamadas para os 48 casos, cerca de 16 mil tokens de entrada e 8 mil de saída, de 21 a 37 s. O plano gratuito do Gemini não cobra.
 - **Citações:** 38 de 38 trechos citados existem literalmente no caso (66 de 66 somando os três resultados v2).
@@ -87,10 +89,22 @@ Mais dois ajustes vieram da leitura das revisões reais. Ambos foram reaplicados
 
 **Custo da política conservadora:** no conjunto difícil, H006 (GPS impreciso, 340 m) e H010 (gorjeta voluntária) vão para revisão mesmo com o modelo certo, porque o sinal forte contradiz o "sem fraude". É de propósito: na dúvida entre o modelo e a telemetria, decide uma pessoa.
 
+### Versão 3: denúncias confusas
+
+As ressalvas da versão 2 diziam que denúncias reais misturam golpes, têm erros de digitação e telemetria falha. A versão 3 ataca isso:
+
+- **Vários golpes no mesmo caso.** O modelo agora pode listar `outras_categorias` além da principal. A política só aceita golpes secundários de terceiros, nunca uma acusação ao cliente, e soma as ações de cada golpe, mantendo a aprovação humana para dinheiro e suspensões. Um golpe secundário também entra quando um sinal forte das regras o apoia (por exemplo, um link externo num caso de cobrança extra).
+- **Erros de digitação.** Antes das regex, as palavras com erro são trocadas pela palavra-chave mais parecida: similaridade de caracteres de 0,8 ou mais, ou as mesmas letras em outra ordem ("cogido" → "codigo"). É uma correção genérica, sem lista de erros decorados. Nos conjuntos principal e difícil, o resultado das regras não mudou (35/48 e 11/17). No ruidoso, ela recupera 1 sinal (o código pedido longe do endereço no caso R001). O ganho é pequeno porque a maior parte dos erros das regras vem de golpes contados só no relato, que elas não leem.
+- **Telemetria ausente.** Um novo sinal, `telemetria_ausente`, aparece quando não há registro de chegada nem de validação do código. Sem telemetria, acusar o cliente de contestação indevida vai sempre para revisão.
+- **Variação entre rodadas.** Com `--rodadas N`, o benchmark mostra a acurácia média, o desvio, o mínimo e o máximo, além da tabela de casos com vários golpes.
+
+As decisões gravadas das três execuções reais da versão 2 foram reprocessadas com a política nova (`fraudguard reaplicar`), e nenhuma categoria ou status mudou.
+
 ### Ressalvas
 
-- **O 100% diz mais sobre os dados que sobre o agente.** Os casos foram escritos à mão, um golpe por caso, com texto claro. Denúncias reais são mais confusas: misturam golpes, têm erros de digitação, telemetria falha e relatos incompletos. Este benchmark mostra que o desenho funciona e segura erros, não que a acurácia em produção seria essa.
-- Há uma execução por modelo e por versão, porque o plano gratuito limita as requisições diárias. `python bench/run_benchmark.py --rodadas 5` repete a medição.
+- **O 100% diz mais sobre os dados que sobre o agente.** Os conjuntos principal e difícil têm um golpe por caso, com texto claro. O conjunto ruidoso existe para medir o que acontece quando não é assim.
+- **O agente com o Gemini ainda não foi medido no conjunto ruidoso.** Esta versão foi feita sem chave de API. Para medir, cadastre o secret `GEMINI_API_KEY` no repositório e rode o workflow manual **bench-llm**: ele roda os três conjuntos com N rodadas e publica os resultados como artefato.
+- As execuções da versão 2 tiveram uma rodada por modelo, porque o plano gratuito limita as requisições diárias.
 - Os limites de 300 m e 50 m são suposições razoáveis, não calibradas com dados reais.
 - A plataforma, o domínio oficial (`deliveryapp.example`), os valores e as pessoas são fictícios.
 
@@ -118,6 +132,7 @@ streamlit run app/streamlit_app.py
 
 # Benchmark
 python bench/run_benchmark.py --so-baseline                 # sem LLM
+python bench/run_benchmark.py --so-baseline --casos data/cases_ruidosos.jsonl --gabarito data/ground_truth_ruidosos.json
 python bench/run_benchmark.py --modelo gemini-3.1-flash-lite
 python bench/run_benchmark.py --de-resultados examples/execucao_gemini/resultados.json
 
@@ -156,7 +171,7 @@ app/                painel Streamlit do analista
 data/               gerador determinístico, casos e gabaritos
 bench/              benchmark e resultados v1/v2
 examples/           execuções reais com o Gemini
-tests/              68 testes: sinais, política, classificador, ponta a ponta, CLI, painel
+tests/              77 testes: sinais, política, classificador, ponta a ponta, CLI, painel, conjunto ruidoso
 ```
 
 ## Decisões de projeto
@@ -168,7 +183,6 @@ tests/              68 testes: sinais, política, classificador, ponta a ponta, 
 
 ## Próximos passos
 
-- Casos com mais de um golpe e rótulos múltiplos.
+- Medir o Gemini no conjunto ruidoso, com várias rodadas (workflow **bench-llm**).
 - Calibrar os limites de distância com dados reais de GPS.
 - Histórico por entregador e por domínio, para detectar golpistas reincidentes.
-- Rodadas repetidas para medir a variação do modelo.

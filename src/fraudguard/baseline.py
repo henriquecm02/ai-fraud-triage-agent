@@ -22,3 +22,20 @@ def classificar_por_regras(sinais: list[Sinal]) -> str:
     if tem(sinais, "entrega_no_endereco") and tem(sinais, "historico_de_contestacoes"):
         return "contestacao_suspeita"
     return "sem_fraude"
+
+
+def categorias_por_regras(sinais: list[Sinal]) -> set[str]:
+    """Todos os golpes de terceiros apoiados por sinais (versão multirrótulo do baseline)."""
+    cats = set()
+    if tem(sinais, "suporte_fora_do_canal"):
+        cats.add("falso_atendente")
+    if tem(sinais, "link_externo"):
+        cats.add("link_malicioso")
+    if tem(sinais, "codigo_validado_longe", "codigo_pedido_longe"):
+        cats.add("codigo_entrega")
+    if tem(sinais, "valor_acima_do_pedido", "cobranca_em_pedido_pago"):
+        cats.add("cobranca_extra")
+    principal = classificar_por_regras(sinais)
+    if principal != "sem_fraude":
+        cats.add(principal)
+    return cats or {"sem_fraude"}
