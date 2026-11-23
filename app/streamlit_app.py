@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import tema
 
 RAIZ = Path(__file__).resolve().parents[1]
 RESULTADOS = Path(os.getenv("FRAUDGUARD_RESULTADOS", RAIZ / "examples" / "execucao_gemini" / "resultados.json"))
@@ -30,9 +31,10 @@ ROTULOS = {
 }
 STATUS = {"revisao_humana": "Revisão humana", "acao_recomendada": "Ação recomendada", "encerrado": "Encerrado"}
 ORDEM = {"alta": 0, "media": 1, "baixa": 2}
+PRIORIDADE = {"alta": ("critico", "Alta"), "media": ("atencao", "Média"), "baixa": ("ok", "Baixa")}
+ICONE_PRIORIDADE = {"alta": "🔴 Alta", "media": "🟠 Média", "baixa": "⚪ Baixa"}
 
-st.set_page_config(page_title="Triagem de fraudes", layout="wide")
-st.title("Triagem de denúncias de fraude")
+st.set_page_config(page_title="Triagem de fraudes", page_icon="🛡️", layout="wide")
 
 if not RESULTADOS.exists():
     st.error(f"Arquivo de resultados não encontrado: {RESULTADOS}. Rode `fraudguard triar` primeiro.")
@@ -50,8 +52,13 @@ decisoes = sorted(resultado["decisoes"],
                   key=lambda d: (d["status"] != "revisao_humana", ORDEM[d["prioridade"]], d["id"]))
 aprovacoes = st.session_state.setdefault("aprovacoes", {})
 
-st.caption(f"Modelo `{resultado['modelo']}` · {resultado['casos']} casos · {resultado['segundos']} s · "
-           f"{resultado['uso']['chamadas']} chamadas ao LLM")
+tema.aplicar_tema(
+    "Triagem de denúncias de fraude",
+    "Fila do analista: o agente lê denúncia, chat e GPS, cita a evidência e sugere a ação. Estorno e suspensão só "
+    "acontecem com aprovação.",
+    kicker="Agente de IA · prevenção a fraudes",
+    chips=[f"Modelo {resultado['modelo']}", f"{resultado['casos']} casos", f"{resultado['segundos']} s",
+           f"{resultado['uso']['chamadas']} chamadas ao LLM"])
 c1, c2, c3 = st.columns(3)
 c1.metric("Revisão humana", sum(d["status"] == "revisao_humana" for d in decisoes))
 c2.metric("Ação recomendada", sum(d["status"] == "acao_recomendada" for d in decisoes))
@@ -61,7 +68,7 @@ filtro = st.multiselect("Status", list(STATUS), default=["revisao_humana", "acao
                         format_func=STATUS.get)
 visiveis = [d for d in decisoes if d["status"] in filtro]
 st.dataframe(pd.DataFrame([{
-    "Caso": d["id"], "Prioridade": d["prioridade"], "Status": STATUS[d["status"]],
+    "Caso": d["id"], "Prioridade": ICONE_PRIORIDADE[d["prioridade"]], "Status": STATUS[d["status"]],
     "Categoria": ROTULOS.get(d["categoria"], d["categoria"]), "Confiança do modelo": d["confianca_modelo"],
     "Sinais que apoiam": ", ".join(d["sinais_que_apoiam"]) or "—",
 } for d in visiveis]), hide_index=True, width="stretch")
@@ -75,10 +82,14 @@ d = next(x for x in visiveis if x["id"] == escolhido)
 caso = casos.get(escolhido, {})
 
 st.subheader(f"{d['id']} · {ROTULOS.get(d['categoria'], d['categoria'])}")
+_nivel, _rotulo = PRIORIDADE[d["prioridade"]]
+st.html(tema.selo(_nivel, f"Prioridade {_rotulo.lower()}") + " " + tema.selo(
+    "atencao" if d["status"] == "revisao_humana" else "ok", STATUS[d["status"]]))
 if d["motivos_revisao"]:
     st.warning("Por que está em revisão: " + "; ".join(d["motivos_revisao"]))
 
-esq, dir_ = st.columns(2)
+esq_, dir__ = st.columns(2)
+esq, dir_ = esq_.container(border=True), dir__.container(border=True)
 with esq:
     st.markdown("**Relato do cliente**")
     st.write(caso.get("relato", "—"))
@@ -107,7 +118,7 @@ with dir_:
     st.markdown("**Mensagem ao cliente**")
     st.info(d["mensagem_cliente"])
 
-st.markdown("**Ações**")
+st.subheader("Ações")
 for a in d["acoes"]:
     chave = f"{d['id']}:{a['acao']}"
     if a["automatica"]:
@@ -115,7 +126,7 @@ for a in d["acoes"]:
         continue
     col_a, col_b, col_c = st.columns([3, 1, 1])
     col_a.markdown(f"- {a['acao']}: **{aprovacoes.get(chave, 'aguardando aprovação')}**")
-    if col_b.button("Aprovar", key="ok-" + chave):
+    if col_b.button("Aprovar", key="ok-" + chave, type="primary"):
         aprovacoes[chave] = "aprovada"
         st.rerun()
     if col_c.button("Recusar", key="no-" + chave):
